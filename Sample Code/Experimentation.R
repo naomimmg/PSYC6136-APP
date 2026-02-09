@@ -11,55 +11,11 @@ library(shiny)
 library(tidyverse)
 
 # Load requisite functions
+source("Functions.R")
+# Import datasets
+source("data.R")
 
-
-# Import sample data sets
-# 1) Employment Status (table)
-Employment <- vcd::Employment
-
-# 2) Infection in Caesarean Births (table)
-Caesar <- vcdExtra::Caesar
-
-# 3) Titanic Data (df)
-Titanic_df <- vcdExtra::Titanicp |>
-    mutate(age = case_when(
-        age >= 15 ~ "Adult",
-        age < 15 ~ "Child",
-        TRUE ~ NA
-    ))
-Titanic <- Titanic_df |>
-    count(sex, age, survived, pclass) |>
-    xtabs(formula = n ~ sex + age + survived + pclass)
-
-structable(pclass ~ sex + age + survived, 
-           data = Titanic)
-
-# 4) Suicide Data
-Suicide <- vcd::Suicide |>
-    xtabs(formula = Freq ~ sex + method + age.group)
-
-# 5) Berkeley Admission Data (table)
-UCBAdmissions <- datasets::UCBAdmissions
-
-# 6) Divorce Data
-Divorce <- vcd::PreSex
-
-# 7) Abortion Opinion Data
-Abortion <- vcdExtra::Abortion
-
-# 8) HairEyeSex Data
-HairEyeSex_df <- datasets::HairEyeColor |>
-    as.data.frame()
-HairEyeSex <- xtabs(Freq ~ Eye + Hair + Sex, data = HairEyeSex_df)
-# structable(HairEyeSex, Sex + Eye ~ Hair)
-
-# 9) HairEye Data
-HairEye <- datasets::HairEyeColor
-
-# 10) Heart Disease Data
-Heart <- vcdExtra::Heart
-
-# List of all data sets
+# Compile all data sets together
 data_sets <- list(Employment, Caesar, Titanic, Suicide, 
                   UCBAdmissions, Divorce, Abortion, HairEyeSex, 
                   Heart, HairEye)
@@ -73,7 +29,9 @@ names(data_sets) <- c("Employment", "Caesar", "Titanic", "Suicide",
 ui <- fluidPage(
     selectInput("select_sample_dat", "Select a Sample Dataset:", 
                 names(data_sets)),
-    uiOutput("table_preview")
+    uiOutput("table_preview"),
+    "Factors and their Levels:",
+    verbatimTextOutput("level_preview")
 )
 
 server <- function(input, output, session) {
@@ -84,6 +42,21 @@ server <- function(input, output, session) {
     output$table_preview <- renderUI({
         color_table(select_dat())
         })
+    
+    preview_levels <- reactive(
+        select_dat() |>  detect_levels(is_table = TRUE)
+    )
+    
+    output$level_preview <- renderPrint({
+        cat(paste(
+            lapply(names(preview_levels()), function(nm) {
+                paste0(
+                    nm, ": ", paste(preview_levels()[[nm]], collapse = ", ")
+                )
+            }),
+            collapse = "\n\n"
+        ))
+    })
 }
 
 shinyApp(ui, server)
@@ -99,7 +72,9 @@ shinyApp(ui, server)
 # Employment_df <- Employment_df |>
 #     dplyr::mutate(EmploymentStatus = factor(EmploymentStatus, levels = c("")))
 # 
-# formula <- as.symbol("Freq ~ EmploymentStatus * EmploymentLength * LayoffCause")
+# formula <- as.formula("Freq ~ EmploymentStatus + EmploymentLength * LayoffCause")
 # 
-# # fit_1 <- MASS::loglm(, data = Employment)
+# fit_1 <- MASS::loglm(Freq ~ ., data = Employment)
+# 
 # mosaic(fit_1, gp = shading_Friendly())
+
