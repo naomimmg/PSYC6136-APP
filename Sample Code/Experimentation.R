@@ -31,22 +31,33 @@ ui <- fluidPage(
                 names(data_sets)),
     uiOutput("table_preview"),
     "Factors and their Levels:",
-    verbatimTextOutput("level_preview")
+    verbatimTextOutput("level_preview"),
+    selectInput("select_factors", 
+                label = "Which factors from the data would you like to include in the mosaic display? (If unspecified, will use all factors.)",
+                # Server will generate choices based on data
+                choices = NULL, 
+                multiple = TRUE),
+    verbatimTextOutput("mod_dat_preview"),
+    plotOutput("mosaic")
 )
 
 server <- function(input, output, session) {
+    # Save selected data to a reactive object
     select_dat <- reactive({
         data_sets[[input$select_sample_dat]]
         })
     
+    # Output color table preview
     output$table_preview <- renderUI({
         color_table(select_dat())
         })
     
+    # Preview levels reactively
     preview_levels <- reactive(
         select_dat() |>  detect_levels(is_table = TRUE)
     )
     
+    # Output level previews
     output$level_preview <- renderPrint({
         cat(paste(
             lapply(names(preview_levels()), function(nm) {
@@ -56,6 +67,36 @@ server <- function(input, output, session) {
             }),
             collapse = "\n\n"
         ))
+    })
+    
+    # Update input selection options for select_factors
+    observeEvent(select_dat(), {
+        freezeReactiveValue(input, "select_factors")
+        updateSelectInput(
+            session = session,
+            inputId = "select_factors",
+            # The choices are the column names of the table
+            # as a data frame, omitting frequency (frequency)
+            # is assumed
+            choices = names(preview_levels()))
+    })
+    
+    # Save reactive object of modified data table
+    mod_dat <- reactive({
+        if(is.null(input$select_factors)) select_dat()
+        # If selected factors to specify
+        else if(!is.null(input$select_factors)) {
+            # Modify data so it only shows those factors
+            xtabs(convert_formula(input$select_factors), data = select_dat())
+        }
+        
+    })
+    
+    output$mod_dat_preview <- renderText(mod_dat())
+    
+    # Output the final mosaic display
+    output$mosaic <- renderPlot({
+        mosaic(select_dat(), gp = vcd::shading_Friendly())
     })
 }
 
