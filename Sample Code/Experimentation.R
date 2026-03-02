@@ -87,16 +87,32 @@ server <- function(input, output, session) {
         # If selected factors to specify
         else if(!is.null(input$select_factors)) {
             # Modify data so it only shows those factors
-            xtabs(convert_formula(input$select_factors), data = select_dat())
+            xtabs(convert_xtabs_formula(input$select_factors), data = select_dat())
         }
         
     })
     
+    # FOR TESTING, see what mod_dat() outputs
     output$mod_dat_preview <- renderText(mod_dat())
+    
+    mod_dat_form <- reactive({
+        mod_dat() |>
+            detect_levels() |>
+            names() |>
+            convert_loglm_formula()
+    })
     
     # Output the final mosaic display
     output$mosaic <- renderPlot({
-        mosaic(select_dat(), gp = vcd::shading_Friendly())
+        mosaic(mod_dat(), gp = vcd::shading_Friendly())
+        
+        # dat <- mod_dat()
+        # form <- mod_dat_form()
+        # 
+        # # Save model and plot mosaic
+        # mod <- MASS::loglm(data = dat,
+        #                    formula = form)
+        # mosaic(mod, gp = vcd::shading_Friendly())
     })
 }
 

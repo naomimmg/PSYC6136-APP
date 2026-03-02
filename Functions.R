@@ -12,7 +12,12 @@ detect_levels <- function(dat, is_table = TRUE) {
 
 # Function converts list of vectors into a formula
 # based upon the selected variables
-convert_formula <- function(factors) {
-  form <- paste(factors, collapse = " + ")
-  as.formula(paste("~", form))
+# For xtabs
+convert_xtabs_formula <- function(factors) {
+  as.formula(paste("Freq ~", paste(factors, collapse = " + ")))
+}
+
+# For loglm
+convert_loglm_formula <- function(factors) {
+  as.formula(paste("~", paste(factors, collapse = " + ")))
 }
