@@ -37,7 +37,14 @@ ui <- fluidPage(
                 # Server will generate choices based on data
                 choices = NULL, 
                 multiple = TRUE),
-    verbatimTextOutput("mod_dat_preview"),
+    # verbatimTextOutput("mod_dat_preview"),
+    # Allow user to specify if they want to provide a formula
+    checkboxInput("customize_formula_on", "Specify full formula?", value = FALSE),
+    uiOutput("formula_spec"),
+    
+    
+    
+    
     plotOutput("mosaic")
 )
 
@@ -93,7 +100,7 @@ server <- function(input, output, session) {
     })
     
     # FOR TESTING, see what mod_dat() outputs
-    output$mod_dat_preview <- renderText(mod_dat())
+    # output$mod_dat_preview <- renderText(mod_dat())
     
     mod_dat_form <- reactive({
         mod_dat() |>
