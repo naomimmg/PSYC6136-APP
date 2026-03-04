@@ -8,6 +8,13 @@
 library(vcd)
 library(vcdExtra)
 library(shiny)
+
+# DEVNOTE: Need to fit model as glm, since MASS::loglm() fails to
+# extract the data found within the shiny environment
+# (No one knows why;
+# see https://stackoverflow.com/questions/31397663/shiny-object-from-reactive-expression-not-found-when-used-in-loglm)
+# library(MASS)
+
 library(tidyverse)
 
 # Load requisite functions
@@ -40,11 +47,13 @@ ui <- fluidPage(
     # verbatimTextOutput("mod_dat_preview"),
     # Allow user to specify if they want to provide a formula
     checkboxInput("customize_formula_on", "Specify full formula?", value = FALSE),
-    uiOutput("formula_spec"),
     
+    conditionalPanel(
+        condition = "input.customize_formula_on == true",
+        textInput("custom_formula", "Enter formula:", placeholder = "Freq ~ A + B + C")
+    ),
     
-    
-    
+    # Plot final mosaic plot
     plotOutput("mosaic")
 )
 
@@ -102,7 +111,13 @@ server <- function(input, output, session) {
     # FOR TESTING, see what mod_dat() outputs
     # output$mod_dat_preview <- renderText(mod_dat())
     
+    # Specify mod_dat_formula
     mod_dat_form <- reactive({
+        if(input$customize_formula_on) {
+            req(input$custom_formula)
+            as.formula(input$custom_formula)
+        }
+        else
         mod_dat() |>
             detect_levels() |>
             names() |>
@@ -111,16 +126,42 @@ server <- function(input, output, session) {
     
     # Output the final mosaic display
     output$mosaic <- renderPlot({
-        mosaic(mod_dat(), gp = vcd::shading_Friendly())
-        
-        # dat <- mod_dat()
-        # form <- mod_dat_form()
-        # 
-        # # Save model and plot mosaic
-        # mod <- MASS::loglm(data = dat,
-        #                    formula = form)
-        # mosaic(mod, gp = vcd::shading_Friendly())
+        # If users specify formula
+        if (input$customize_formula_on) {
+            req(input$custom_formula)
+            
+            df  <- as.data.frame(select_dat())
+            
+            mod.glm <- glm(
+                formula = mod_dat_form(),
+                data    = df,
+                family  = poisson()
+            )
+            
+            vcd::mosaic(mod.glm, data = df, gp = vcd::shading_Friendly())
+        } else {
+            vcd::mosaic(mod_dat(), gp = vcd::shading_Friendly())
+        }
     })
+    
+    
+    # output$mosaic <- renderPlot({
+    #     # If user specified formula, use specified
+    #     # formula within informed plot
+    #     if (input$customize_formula_on) {
+    #         req(input$custom_formula)
+    #         mod.glm <- glm(formula = mod_dat_form(), data = as.data.frame(select_dat()))
+    #         
+    #         vcd::mosaic(mod.glm, data = select_dat(), gp = vcd::shading_Friendly())
+    #     # Otherwise, plot based on the mod_dat()
+    #     # (selected columns, or default)
+    #     } else {
+    #         mosaic(
+    #             mod_dat(),
+    #             gp = vcd::shading_Friendly()
+    #         )
+    #     }
+    # })
 }
 
 shinyApp(ui, server)
