@@ -184,11 +184,11 @@ server <- function(input, output, session) {
             # Save formula for title
             form_txt <- paste(deparse(mod_dat_form()), collapse = "")
             
-            suppressWarnings(vcd::mosaic(mod.glm, data = df, gp = vcd::shading_Friendly(), main = form_txt, cex.main = 0.8))
+            suppressWarnings(vcd::mosaic (mod.glm, data = df, gp = vcd::shading_Friendly(), main = form_txt, cex.main = 0.8, labeling = labeling_residuals()))
         }
         
         else {
-            vcd::mosaic(mod_dat(), gp = vcd::shading_Friendly())
+            vcd::mosaic(mod_dat(), gp = vcd::shading_Friendly(), labeling = labeling_residuals())
         }
     })
 }
