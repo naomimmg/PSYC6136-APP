@@ -111,3 +111,8 @@ show_all_formulas <- function(factors, response = "Freq") {
     unlist(out)
     }
 }
+
+
+char <- c("A", "B", "C")
+show_all_formulas(char)
+

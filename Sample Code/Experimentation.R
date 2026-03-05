@@ -144,9 +144,20 @@ server <- function(input, output, session) {
     
     # Specify mod_dat_formula
     mod_dat_form <- reactive({
-        if(input$customize_formula_options == "Write custom formula") {
+        if (input$customize_formula_options == "Write custom formula") {
             req(input$custom_formula)
-            as.formula(input$custom_formula)
+            
+            # Add logic to tell users to input valid formula
+            f <- try(as.formula(input$custom_formula), silent = TRUE)
+            
+            # If formula is invalid, or generates an error,
+            # write out custom message instead to avoid clutter.
+            validate(
+                need(!inherits(f, "try-error"),
+                     "Please input a complete valid formula (e.g., Freq ~ A + B + C).")
+            )
+            
+            f
         }
         
         else if ((input$customize_formula_options == "Select among defaults") ) {
@@ -156,7 +167,6 @@ server <- function(input, output, session) {
         else {
             dat_factors() |> convert_loglm_formula()
         }
-        
     })
     
     # Output the final mosaic display
