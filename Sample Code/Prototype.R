@@ -62,6 +62,19 @@ ui <- fluidPage(
         uiOutput("select_formula")
     ),
     
+    # Allow user to always customize:
+    # 1) Residuals
+    selectInput("residual_type", "Specify residual type:",
+                choices = c("pearson", "deviance", "ft"),
+                selected = "pearson"),
+    
+    # 2) Shading
+    selectInput(
+        "shading_type", "Specify shading type:",
+        choices  = c("Friendly", "Friendly2", "sieve", "binary"),
+        selected = "Friendly"
+    ),
+    
     # Plot final mosaic plot
     plotOutput("mosaic")
 )
@@ -169,6 +182,27 @@ server <- function(input, output, session) {
         }
     })
     
+    # Save reactive object for residual type
+    selected_residual <- reactive({
+        input$residual_type
+    })
+    
+    # Save reactive object for shading type
+    selected_shading <- reactive({
+        switch(input$shading_type,
+               "Friendly" = vcd::shading_Friendly(),
+               "Friendly2" = vcd::shading_Friendly2(),
+               "sieve" = vcd::shading_sieve(),
+               "binary" = vcd::shading_binary(
+                   # SPECIFY COLOR (TO DO NEXT)
+                   # NEED TO ADD USER INPUT FOR
+                   # COLORS TO SPECIFY, only showing
+                   # it for binary
+                   # col = 1:2
+                   )
+               )
+    })
+    
     # Output the final mosaic display
     output$mosaic <- renderPlot({
         # If users specify formula
@@ -184,11 +218,18 @@ server <- function(input, output, session) {
             # Save formula for title
             form_txt <- paste(deparse(mod_dat_form()), collapse = "")
             
-            suppressWarnings(vcd::mosaic (mod.glm, data = df, gp = vcd::shading_Friendly(), main = form_txt, cex.main = 0.8, labeling = labeling_residuals()))
+            suppressWarnings(vcd::mosaic(mod.glm, data = df, 
+                                         gp = selected_shading(), 
+                                         main = form_txt, 
+                                         cex.main = 0.8, 
+                                         labeling = labeling_residuals(),
+                                         residuals_type = selected_residual()))
         }
         
         else {
-            vcd::mosaic(mod_dat(), gp = vcd::shading_Friendly(), labeling = labeling_residuals())
+            vcd::mosaic(mod_dat(), gp = selected_shading(), 
+                        labeling = labeling_residuals(),
+                        residuals_type = selected_residual())
         }
     })
 }
