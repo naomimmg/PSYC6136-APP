@@ -45,12 +45,21 @@ ui <- fluidPage(
                 choices = NULL, 
                 multiple = TRUE),
     # verbatimTextOutput("mod_dat_preview"),
-    # Allow user to specify if they want to provide a formula
-    checkboxInput("customize_formula_on", "Specify full formula?", value = FALSE),
+    # Allow user to specify if they want to provide a formula, and if so,
+    # whether want defaults or customize their own
+    radioButtons("customize_formula_options", "How would you like to customize the formula for the model?",
+                choices = c("No customization", "Select among defaults", "Write custom formula")),
     
+    # If writing custom formula, allow user to do so
     conditionalPanel(
-        condition = "input.customize_formula_on == true",
+        condition = "input.customize_formula_options == 'Write custom formula'",
         textInput("custom_formula", "Enter formula:", placeholder = "Freq ~ A + B + C")
+    ),
+    
+    # If selecting custom formula, allow user to do so
+    conditionalPanel(
+        condition = "input.customize_formula_options == 'Select among defaults'",
+        uiOutput("select_formula")
     ),
     
     # Plot final mosaic plot
@@ -65,7 +74,8 @@ server <- function(input, output, session) {
     
     # Output color table preview
     output$table_preview <- renderUI({
-        color_table(select_dat())
+        color_table(select_dat(),
+                    legend = "")
         })
     
     # Preview levels reactively
@@ -108,28 +118,51 @@ server <- function(input, output, session) {
         
     })
     
-    # FOR TESTING, see what mod_dat() outputs
-    # output$mod_dat_preview <- renderText(mod_dat())
+    # Save character vector of names from the specific
+    # data set
+    dat_factors <- reactive({
+        mod_dat() |>
+            detect_levels() |>
+            names()
+    })
+    
+    # Save vector of all reasonable formula names
+    reasonable_formulas <- reactive({
+        show_all_formulas(dat_factors())
+    })
+    
+    # Update UI to support all reasonable defaults
+    output$select_formula <- renderUI({
+        req(input$customize_formula_options == "Select among defaults")
+        
+        selectInput(
+            inputId = "selected_formula",
+            label   = "Choose a default formula:",
+            choices = reasonable_formulas()   # names shown, values returned
+        )
+    })
     
     # Specify mod_dat_formula
     mod_dat_form <- reactive({
-        if(input$customize_formula_on) {
+        if(input$customize_formula_options == "Write custom formula") {
             req(input$custom_formula)
             as.formula(input$custom_formula)
         }
-        else
-        mod_dat() |>
-            detect_levels() |>
-            names() |>
-            convert_loglm_formula()
+        
+        else if ((input$customize_formula_options == "Select among defaults") ) {
+            req(input$selected_formula)
+            as.formula(input$selected_formula)
+        }
+        else {
+            dat_factors() |> convert_loglm_formula()
+        }
+        
     })
     
     # Output the final mosaic display
     output$mosaic <- renderPlot({
         # If users specify formula
-        if (input$customize_formula_on) {
-            req(input$custom_formula)
-            
+        if (input$customize_formula_options != "No customization") {
             df  <- as.data.frame(select_dat())
             
             mod.glm <- glm(
@@ -138,48 +171,16 @@ server <- function(input, output, session) {
                 family  = poisson()
             )
             
-            vcd::mosaic(mod.glm, data = df, gp = vcd::shading_Friendly())
-        } else {
+            # Save formula for title
+            form_txt <- paste(deparse(mod_dat_form()), collapse = "")
+            
+            suppressWarnings(vcd::mosaic(mod.glm, data = df, gp = vcd::shading_Friendly(), main = form_txt, cex.main = 0.8))
+        }
+        
+        else {
             vcd::mosaic(mod_dat(), gp = vcd::shading_Friendly())
         }
     })
-    
-    
-    # output$mosaic <- renderPlot({
-    #     # If user specified formula, use specified
-    #     # formula within informed plot
-    #     if (input$customize_formula_on) {
-    #         req(input$custom_formula)
-    #         mod.glm <- glm(formula = mod_dat_form(), data = as.data.frame(select_dat()))
-    #         
-    #         vcd::mosaic(mod.glm, data = select_dat(), gp = vcd::shading_Friendly())
-    #     # Otherwise, plot based on the mod_dat()
-    #     # (selected columns, or default)
-    #     } else {
-    #         mosaic(
-    #             mod_dat(),
-    #             gp = vcd::shading_Friendly()
-    #         )
-    #     }
-    # })
 }
 
 shinyApp(ui, server)
-# NOTES:
-# Employment_df <- Employment |> 
-#     tibble::as.tibble()
-# 
-# 
-# 
-# new_levels <- c("Unemployed", "NewJob")
-# 
-# 
-# Employment_df <- Employment_df |>
-#     dplyr::mutate(EmploymentStatus = factor(EmploymentStatus, levels = c("")))
-# 
-# formula <- as.formula("Freq ~ EmploymentStatus + EmploymentLength * LayoffCause")
-# 
-# fit_1 <- MASS::loglm(Freq ~ ., data = Employment)
-# 
-# mosaic(fit_1, gp = shading_Friendly())
-
