@@ -26,9 +26,10 @@ source("data.R")
 data_sets <- list(Employment, Caesar, Titanic, Suicide, 
                   UCBAdmissions, Divorce, Abortion, HairEyeSex, 
                   Heart, HairEye)
-names(data_sets) <- c("Employment", "Caesar", "Titanic", "Suicide", 
-                      "UCBAdmissions", "Divorce", "Abortion", "HairEyeSex", 
-                      "Heart", "HairEye")
+names(data_sets) <- c("Employment Status Data", "Infection in Cesarean Births",
+                      "Titanic Data", "Suicide Data", "Berkeley Admission Data", 
+                      "Divorce Data", "Abortion Opinion Data", 
+                      "HairEyeSex Data", "Heart Disease Data", "HairEye Data")
 
 # Create mini-app to allow users to
 # select a data set, and have it preview the
@@ -229,7 +230,7 @@ server <- function(input, output, session) {
             # If residual does not work, give user message and do not
             # output the plot
             res_ok <- tryCatch({
-                vcd::mosaic(
+                suppressWarnings(vcd::mosaic(
                     mod.glm,
                     data = df,
                     gp = selected_shading(),
@@ -237,14 +238,14 @@ server <- function(input, output, session) {
                     cex.main = 0.8,
                     labeling = labeling_residuals(),
                     residuals_type = selected_residual()
-                )
+                ))
                 TRUE
             }, error = function(e) FALSE)
             
             validate(
                 need(
                     res_ok,
-                    "Selected residual type is not available for this plot. Please choose another one."
+                    "Selected residual type is not available for this plot. Please select another one."
                 )
             )
             
