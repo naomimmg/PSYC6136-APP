@@ -71,8 +71,15 @@ ui <- fluidPage(
     # 2) Shading
     selectInput(
         "shading_type", "Specify shading type:",
-        choices  = c("Friendly", "Friendly2", "sieve", "binary"),
+        choices  = c("Friendly", "Friendly2", "sieve", "custom"),
         selected = "Friendly"
+    ),
+    
+    # If select custom, show custom color controls
+    conditionalPanel(
+        condition = "input.shading_type == 'custom'",
+        textInput("color_1", "First color", value = "3"),
+        textInput("color_2", "Second color", value = "4"),
     ),
     
     # Plot final mosaic plot
@@ -187,18 +194,19 @@ server <- function(input, output, session) {
         input$residual_type
     })
     
+    # Save custom colors specified
+    colors_selected <- reactive({
+        c(input$color_1, input$color_2)
+    })
+    
     # Save reactive object for shading type
     selected_shading <- reactive({
         switch(input$shading_type,
                "Friendly" = vcd::shading_Friendly(),
                "Friendly2" = vcd::shading_Friendly2(),
                "sieve" = vcd::shading_sieve(),
-               "binary" = vcd::shading_binary(
-                   # SPECIFY COLOR (TO DO NEXT)
-                   # NEED TO ADD USER INPUT FOR
-                   # COLORS TO SPECIFY, only showing
-                   # it for binary
-                   # col = 1:2
+               "custom" = vcd::shading_binary(
+                   col = colors_selected()
                    )
                )
     })
