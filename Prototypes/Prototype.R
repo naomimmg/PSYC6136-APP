@@ -31,9 +31,9 @@ names(data_sets) <- c("Employment Status Data", "Infection in Cesarean Births",
                       "Divorce Data", "Abortion Opinion Data", 
                       "HairEyeSex Data", "Heart Disease Data", "HairEye Data")
 
-# Create mini-app to allow users to
-# select a data set, and have it preview the
-# data set as a color table
+# Prototype will be set up to do everything full app can,
+# but the ui will be dis-organized to have all controls
+# accessible for easy testing.
 ui <- fluidPage(
     selectInput("select_sample_dat", "Select a Sample Dataset:", 
                 names(data_sets)),
@@ -87,6 +87,8 @@ ui <- fluidPage(
     plotOutput("mosaic")
 )
 
+# Server builds commands in final app. Final app should,
+# generally, use this same server function
 server <- function(input, output, session) {
     # Save selected data to a reactive object
     select_dat <- reactive({

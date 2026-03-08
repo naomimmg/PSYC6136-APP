@@ -112,7 +112,28 @@ show_all_formulas <- function(factors, response = "Freq") {
     }
 }
 
+# Function to detect whether variable is categorical
+# (i.e., is character or factor type)
+is.cat <- function(obj) {
+    is.factor(obj) | is.character(obj)
+}
 
-char <- c("A", "B", "C")
-show_all_formulas(char)
+# Function to extract vector of columns for categorical data
+extract_cat <- function(dat) {
+    names(dat)[
+        sapply(dat, is.cat) |
+            tolower(names(dat)) %in% c("freq", "n", "count")
+    ]
+}
+
+# Function to select columns with categorical data
+select_cat <- function(dat) {
+    dat |> 
+        dplyr::select(extract_cat(dat)) |>
+        tibble::as_tibble()
+}
+
+# accident <- vcdExtra::Accident |> dplyr::mutate(numeric = rnorm(80))
+# accident |> select_cat()
+
 
