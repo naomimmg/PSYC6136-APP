@@ -81,11 +81,8 @@ ui <- fluidPage(
     # If select custom, show custom color controls
     conditionalPanel(
         condition = "input.shading_type == 'custom'",
-        colourpicker::colourInput("color_1", "First color (+ve residuals)", value = "4"),
-        colourpicker::colourInput("color_2", "Second color (-ve residuals)", value = "2")
-        
-        # textInput("color_1", "First color (+ve residuals)", value = "4"),
-        # textInput("color_2", "Second color (-ve residuals)", value = "2"),
+        colourpicker::colourInput("color_1", "First color (+ve residuals)", value = "#0072B2"),
+        colourpicker::colourInput("color_2", "Second color (-ve residuals)", value = "#F70D20")
     ),
     
     # Plot final mosaic plot
