@@ -62,6 +62,8 @@ server <- function(input, output, session) {
         select_cat(data())
     })
     
+    # 
+    
     # Print out data with only the categorical variables
     output$preview_cat <- renderTable({
         head(cat_dat(), input$n)
