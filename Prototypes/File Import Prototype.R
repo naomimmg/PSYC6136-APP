@@ -1,7 +1,7 @@
 ##### File import prototype #####
 # Install current version of vcdExtra
 # for color_table() function
-devtools::install_github("https://github.com/friendly/vcdExtra")
+# devtools::install_github("https://github.com/friendly/vcdExtra")
 
 # Load packages
 library(vcd)

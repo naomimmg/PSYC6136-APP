@@ -7,6 +7,7 @@
 # Load packages
 library(vcd)
 library(vcdExtra)
+library(colourpicker)
 library(shiny)
 
 # DEVNOTE: Need to fit model as glm, since MASS::loglm() fails to
@@ -65,9 +66,10 @@ ui <- fluidPage(
     
     # Allow user to always customize:
     # 1) Residuals
+    # (We'll change the options based on whether the user
+    # uses a custom formula)
     selectInput("residual_type", "Specify residual type:",
-                choices = c("pearson", "deviance", "ft", "rstandard"),
-                selected = "pearson"),
+                choices = NULL),
     
     # 2) Shading
     selectInput(
@@ -79,8 +81,11 @@ ui <- fluidPage(
     # If select custom, show custom color controls
     conditionalPanel(
         condition = "input.shading_type == 'custom'",
-        textInput("color_1", "First color (+ve residuals)", value = "4"),
-        textInput("color_2", "Second color (-ve residuals)", value = "2"),
+        colourpicker::colourInput("color_1", "First color (+ve residuals)", value = "4"),
+        colourpicker::colourInput("color_2", "Second color (-ve residuals)", value = "2")
+        
+        # textInput("color_1", "First color (+ve residuals)", value = "4"),
+        # textInput("color_2", "Second color (-ve residuals)", value = "2"),
     ),
     
     # Plot final mosaic plot
@@ -192,10 +197,28 @@ server <- function(input, output, session) {
         }
     })
     
+    # Update residual inputs based on whether a formula
+    observeEvent(input$customize_formula_options, {
+        if (input$customize_formula_options != "No customization") {
+            updateSelectInput(
+                session,
+                "residual_type",
+                choices = c("pearson", "deviance", "rstandard")
+            )
+        } else {
+            updateSelectInput(
+                session,
+                "residual_type",
+                choices = c("pearson", "deviance", "ft")
+            )
+        }
+    })
+    
     # Save reactive object for residual type
     selected_residual <- reactive({
         input$residual_type
     })
+    
     
     # Save custom colors specified
     colors_selected <- reactive({
@@ -214,11 +237,13 @@ server <- function(input, output, session) {
                )
     })
     
+    
     # Output the final mosaic display
     output$mosaic <- renderPlot({
         # If users specify formula
         if (input$customize_formula_options != "No customization") {
-            df  <- as.data.frame(select_dat())
+            # Save dat into data frame
+            df  <- as.data.frame(mod_dat())
             
             mod.glm <- glm(
                 formula = mod_dat_form(),
@@ -228,28 +253,6 @@ server <- function(input, output, session) {
             
             # Save formula for title
             form_txt <- paste(deparse(mod_dat_form()), collapse = "")
-            
-            # If residual does not work, give user message and do not
-            # output the plot
-            res_ok <- tryCatch({
-                suppressWarnings(vcd::mosaic(
-                    mod.glm,
-                    data = df,
-                    gp = selected_shading(),
-                    main = form_txt,
-                    cex.main = 0.8,
-                    labeling = labeling_residuals(),
-                    residuals_type = selected_residual()
-                ))
-                TRUE
-            }, error = function(e) FALSE)
-            
-            validate(
-                need(
-                    res_ok,
-                    "Selected residual type is not available for this plot. Please select another one."
-                )
-            )
             
             # Output plot
             suppressWarnings(vcd::mosaic(mod.glm, data = df, 
@@ -262,23 +265,6 @@ server <- function(input, output, session) {
         
         # Otherwise, output plot based on selected data
         else {
-            # Same idea with residuals
-            res_ok <- tryCatch({
-                vcd::mosaic(
-                    mod_dat(),
-                    gp = selected_shading(),
-                    labeling = labeling_residuals(),
-                    residuals_type = selected_residual()
-                )
-                TRUE
-            }, error = function(e) FALSE)
-            
-            validate(
-                need(
-                    res_ok,
-                    "Selected residual type is not available for this plot. Please choose another one."
-                )
-            )
             vcd::mosaic(mod_dat(), gp = selected_shading(), 
                         labeling = labeling_residuals(),
                         residuals_type = selected_residual())
