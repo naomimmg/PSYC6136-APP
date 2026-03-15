@@ -46,7 +46,6 @@ ui <- fluidPage(
                 # Server will generate choices based on data
                 choices = NULL, 
                 multiple = TRUE),
-    # verbatimTextOutput("mod_dat_preview"),
     # Allow user to specify if they want to provide a formula, and if so,
     # whether want defaults or customize their own
     radioButtons("customize_formula_options", "How would you like to customize the formula for the model?",
