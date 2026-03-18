@@ -36,8 +36,24 @@ names(data_sets) <- c("Employment Status Data", "Infection in Cesarean Births",
 # but the ui will be dis-organized to have all controls
 # accessible for easy testing.
 ui <- fluidPage(
-    selectInput("select_sample_dat", "Select a Sample Dataset:", 
-                names(data_sets)),
+    radioButtons("data_option",
+                 "Would you like to use sample data or upload your own?",
+                 choices = c("Use sample data", "Upload data"),
+                 select = "Use sample data"),
+    
+    conditionalPanel(
+        condition = "input.data_option == 'Use sample data'",
+        selectInput("select_sample_dat", "Select a Sample Dataset:", 
+                names(data_sets))
+        ),
+    
+    conditionalPanel(
+        condition = "input.data_option == 'Upload data'",
+        fileInput("upload", NULL, accept = c(".csv", ".tsv")),
+        uiOutput("var_select_inputs"),
+        
+    ),
+    
     uiOutput("table_preview"),
     "Factors and their Levels:",
     verbatimTextOutput("level_preview"),
@@ -91,9 +107,83 @@ ui <- fluidPage(
 # Server builds commands in final app. Final app should,
 # generally, use this same server function
 server <- function(input, output, session) {
-    # Save selected data to a reactive object
+    # Allow custom data import
+    data <- reactive({
+        req(input$upload)
+        
+        ext <- tools::file_ext(input$upload$name)
+        
+        switch(
+            ext,
+            csv = vroom::vroom(input$upload$datapath, delim = ","),
+            tsv = vroom::vroom(input$upload$datapath, delim = "\t"),
+            validate("Invalid file; Please upload a .csv or .tsv file")
+        )
+    })
+    
+    # Create reactive object to save names in data to pull from
+    all_choices <- reactive({
+        req(data())
+        names(data())
+    })
+    
+    # Update inputs based on imported data
+    observe({
+        req(data())
+        
+        vars_choices <- setdiff(all_choices(), input$select_freq)
+        freq_choices <- setdiff(all_choices(), input$select_variables)
+        
+        updateSelectInput(
+            session,
+            "select_variables",
+            choices = vars_choices,
+            selected = intersect(input$select_variables, vars_choices)
+        )
+        
+        updateSelectInput(
+            session,
+            "select_freq",
+            choices = freq_choices,
+            selected = intersect(input$select_freq, freq_choices)
+        )
+    })
+    
+    # Make the inputs only appear if data is imported
+    output$var_select_inputs <- renderUI({
+        req(data())
+        
+        tagList(
+            selectInput(
+                "select_freq",
+                label = "Select the variable that corresponds to frequency in the data set",
+                choices = all_choices(),
+                multiple = FALSE
+            ),
+            
+            selectInput(
+                "select_variables",
+                label = "Select all of the CATEGORICAL variables in your imported data",
+                choices = all_choices(),
+                multiple = TRUE
+            )
+        )
+    })
+    
+    # Save selected/imported data to a reactive object
     select_dat <- reactive({
-        data_sets[[input$select_sample_dat]]
+        if (input$data_option == "Use sample data"){
+            data_sets[[input$select_sample_dat]]
+        }
+        
+        else {
+            req(data(), input$select_freq, input$select_variables)
+            form <- as.formula(paste(input$select_freq, "~", paste(input$select_variables, collapse = " + ")))
+            
+            # 2) apply formula to xtabs
+            xtabs(form, data = data())
+            
+        }
         })
     
     # Output color table preview
