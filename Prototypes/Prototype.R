@@ -65,7 +65,8 @@ ui <- fluidPage(
     # Allow user to specify if they want to provide a formula, and if so,
     # whether want defaults or customize their own
     radioButtons("customize_formula_options", "How would you like to customize the formula for the model?",
-                choices = c("No customization", "Select among defaults", "Write custom formula")),
+                choices = c("No customization", "Select among defaults", "Write custom formula")
+                ),
     
     # If writing custom formula, allow user to do so
     conditionalPanel(
@@ -93,15 +94,38 @@ ui <- fluidPage(
         selected = "Friendly"
     ),
     
-    # If select custom, show custom color controls
+    # 2a) If select custom theme, show custom color controls
     conditionalPanel(
         condition = "input.shading_type == 'custom'",
         colourpicker::colourInput("color_1", "First color (+ve residuals)", value = "#0072B2"),
         colourpicker::colourInput("color_2", "Second color (-ve residuals)", value = "#F70D20")
     ),
     
+    # 3) Whether or not to show residual labels in plot
+    checkboxInput(
+        "show_residuals",
+        "Show residuals?",
+        TRUE
+    ),
+    
+    # 4) Whether or not to display the formula in the plot
+    checkboxInput(
+        "show_formula",
+        "Display formula in the plot?",
+        TRUE
+    ),
+    
+    # 5) Output G^2 value from the model
+    conditionalPanel(condition = "input.customize_formula_options != 'No customization'",
+        checkboxInput(
+        "show_g_square",
+        "Display G² from the model?",
+        FALSE
+    )
+    ),
+    
     # Plot final mosaic plot
-    plotOutput("mosaic")
+    plotOutput("mosaic"),
 )
 
 # Server builds commands in final app. Final app should,
@@ -323,38 +347,69 @@ server <- function(input, output, session) {
                )
     })
     
-    
-    # Output the final mosaic display
     output$mosaic <- renderPlot({
-        # If users specify formula
-        if (input$customize_formula_options != "No customization") {
-            # Save dat into data frame
-            df  <- as.data.frame(mod_dat())
-            
-            mod.glm <- glm(
-                formula = mod_dat_form(),
-                data    = df,
-                family  = poisson()
-            )
-            
-            # Save formula for title
-            form_txt <- paste(deparse(mod_dat_form()), collapse = "")
-            
-            # Output plot
-            suppressWarnings(vcd::mosaic(mod.glm, data = df, 
-                                         gp = selected_shading(), 
-                                         main = form_txt, 
-                                         cex.main = 0.8, 
-                                         labeling = labeling_residuals(),
-                                         residuals_type = selected_residual()))
+        # Capture whether or not a formula is being customized
+        customized <- input$customize_formula_options != "No customization"
+        
+        # Capture formula name
+        form_txt <- paste(deparse(mod_dat_form()), collapse = "")
+        
+        # Create list of arguments, beginning with specifying shading
+        args <- list(
+            gp = selected_shading()
+            # Modify size of title
+        )
+        
+        # Initialize model object
+        mod.glm <- NULL
+        
+        # If customized, add in appropriate arguments,
+        # including glm-based formula
+        if (customized) {
+            df <- as.data.frame(mod_dat())
+            mod.glm <- glm(mod_dat_form(), data = df, family = poisson())
+            args$x <- mod.glm
+            args$data <- df
+            # If not customized, simply add in that x is the 
+            # modified data set
+        } else {
+            args$x <- mod_dat()
         }
         
-        # Otherwise, output plot based on selected data
-        else {
-            vcd::mosaic(mod_dat(), gp = selected_shading(), 
-                        labeling = labeling_residuals(),
-                        residuals_type = selected_residual())
+        # Add residuals if specified
+        if (input$show_residuals) {
+            args$labeling <- labeling_residuals()
+            args$residuals_type <- selected_residual()
         }
+        
+        # Display formula if specified
+        if (input$show_formula) {
+            args$main <- form_txt
+        }
+        
+        # Build title text
+        main_txt <- NULL
+        
+        if (input$show_formula) {
+            main_txt <- paste(deparse(mod_dat_form()), collapse = "")
+        }
+        
+        if (input$show_g_square && customized) {
+            G2_txt <- paste0("G² = ", round(deviance(mod.glm), 2))
+            
+            main_txt <- if (is.null(main_txt)) {
+                G2_txt
+            } else {
+                paste(main_txt, G2_txt, sep = ", ")
+            }
+        }
+        
+        if (!is.null(main_txt)) {
+            args$main <- main_txt
+        }
+        
+        suppressWarnings(do.call(vcd::mosaic, args))
+        
     })
 }
 
