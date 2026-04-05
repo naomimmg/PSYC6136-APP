@@ -1,4 +1,23 @@
 server <- function(input, output, session) {
+    observe({
+        data_ready <- FALSE
+        if (input$data_option == "Use sample data" && input$select_sample_dat != "") {
+            data_ready <- TRUE
+        } else if (input$data_option == "Upload data" &&
+                   !is.null(input$upload) &&
+                   !is.null(input$select_freq) && input$select_freq != "" &&
+                   !is.null(input$select_variables) && length(input$select_variables) > 0) {
+            data_ready <- TRUE
+        }
+        
+        if (data_ready) {
+            shinyjs::show("tab1_contents")
+            shinyjs::hide("welcome_panel")
+        } else {
+            shinyjs::hide("tab1_contents")
+            shinyjs::show("welcome_panel")
+        }
+    })
     
     disableTabs <- function() {
         runjs("$('.nav-tabs li').addClass('disabled');")
@@ -74,6 +93,11 @@ server <- function(input, output, session) {
         names(detect_levels(mod_dat()))
     })
     
+    output$preview_vars <- renderText({
+        fcts <- paste(dat_factors(), collapse = ", ")
+        paste("Factors:", fcts)
+    })
+    
     reasonable_formulas <- reactive({
         show_all_formulas(dat_factors())
     })
@@ -81,6 +105,12 @@ server <- function(input, output, session) {
     output$select_formula_ui <- renderUI({
         req(input$customize_formula_options == "Select among defaults")
         selectInput("selected_formula", "Choose a default formula:", choices = reasonable_formulas())
+    })
+    
+    output$formula_preview <- renderText({
+        req(input$customize_formula_options == "Select among defaults")
+        if(is.null(input$selected_formula)) "Please specify a default formula"
+        paste0("Formula: ", as.character(input$selected_formula))
     })
     
     mod_dat_form <- reactive({
@@ -128,14 +158,16 @@ server <- function(input, output, session) {
             args$x <- mod_dat()
         }
         
+        # Always input appropriate residuals
+        args$residuals_type <- input$residual_type
+        
         if (input$show_residuals) {
             args$labeling <- labeling_residuals()
-            args$residuals_type <- input$residual_type
         }
         
         main_txt <- NULL
         if (input$show_formula) main_txt <- paste(deparse(mod_dat_form()), collapse = "")
-        if (input$show_g_square && customized) {
+        if (input$show_g_square & customized) {
             g2_val <- paste0("G² = ", round(deviance(mod.glm), 2))
             main_txt <- if (is.null(main_txt)) g2_val else paste(main_txt, g2_val, sep = ", ")
         }

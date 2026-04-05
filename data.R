@@ -43,3 +43,12 @@ HairEye <- datasets::HairEyeColor
 
 # 10) Heart Disease Data
 Heart <- vcdExtra::Heart
+
+# Save data into list
+data_sets <- list(Employment, Caesar, Titanic, Suicide, 
+                  UCBAdmissions, Divorce, Abortion, HairEyeSex, 
+                  Heart, HairEye)
+
+names(data_sets) <- c("Employment", "Caesar", "Titanic", "Suicide", 
+                      "UCBAdmissions", "Divorce", "Abortion", "HairEyeSex", 
+                      "Heart", "HairEye")
