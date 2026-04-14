@@ -1,4 +1,5 @@
 server <- function(input, output, session) {
+    #----- General setup/navigation ----
     observe({
         data_ready <- FALSE
         if (input$data_option == "Use sample data" && input$select_sample_dat != "") {
@@ -31,6 +32,34 @@ server <- function(input, output, session) {
     observeEvent(input$next3, { updateTabsetPanel(session, "tabs", selected = "tab4") })
     observeEvent(input$back4, { updateTabsetPanel(session, "tabs", selected = "tab3") })
     
+    observeEvent(input$freq_help, {
+        showModal(modalDialog(
+            title = "Frequency Format",
+            
+            tags$p(
+                "Each row is a unique combination",
+                " of categorical variables, along with a frequency column indicating how many times that combination occurs."
+            ),
+            
+            tags$strong("Example:"), br(),
+            tableOutput("example_table"),
+            
+            easyClose = TRUE,
+            footer = modalButton("Close")
+        ))
+    })
+    
+    example_df <- data.frame(
+        Gender = c("Male", "Female", "Male", "Female"),
+        Age = c("Young", "Young", "Old", "Old"),
+        freq = c(12, 15, 9, 11)
+    )
+    
+    output$example_table <- renderTable({
+        example_df
+    }, rownames = FALSE)
+    
+    # ---- Code for App Behavior -----
     uploaded_data <- reactive({
         req(input$upload)
         ext <- tools::file_ext(input$upload$name)
@@ -49,6 +78,8 @@ server <- function(input, output, session) {
         )
     })
     
+    
+    
     select_dat <- reactive({
         if (input$data_option == "Use sample data") {
             req(input$select_sample_dat)
@@ -59,6 +90,7 @@ server <- function(input, output, session) {
             xtabs(form, data = uploaded_data())
         }
     })
+
     
     output$table_preview <- renderUI({
         req(select_dat())
@@ -103,12 +135,12 @@ server <- function(input, output, session) {
     })
     
     output$select_formula_ui <- renderUI({
-        req(input$customize_formula_options == "Select among defaults")
-        selectInput("selected_formula", "Choose a default formula:", choices = reasonable_formulas())
+        req(input$customize_formula_options == "Select model type")
+        selectInput("selected_formula", "Choose a model type:", choices = reasonable_formulas())
     })
     
     output$formula_preview <- renderText({
-        req(input$customize_formula_options == "Select among defaults")
+        req(input$customize_formula_options == "Select model type")
         if(is.null(input$selected_formula)) "Please specify a default formula"
         paste0("Formula: ", as.character(input$selected_formula))
     })
@@ -119,7 +151,7 @@ server <- function(input, output, session) {
             f <- try(as.formula(input$custom_formula), silent = TRUE)
             validate(need(!inherits(f, "try-error"), "Please input a valid formula (e.g., Freq ~ A + B)."))
             f
-        } else if (input$customize_formula_options == "Select among defaults") {
+        } else if (input$customize_formula_options == "Select model type") {
             req(input$selected_formula)
             as.formula(input$selected_formula)
         } else {
@@ -165,13 +197,22 @@ server <- function(input, output, session) {
             args$labeling <- labeling_residuals()
         }
         
+        # Helper function to make plots output more flexibly
+        wrap_title <- function(x, width = 60) {
+            paste(strwrap(x, width = width), collapse = "\n")
+        }
+        
         main_txt <- NULL
         if (input$show_formula) main_txt <- paste(deparse(mod_dat_form()), collapse = "")
         if (input$show_g_square & customized) {
             g2_val <- paste0("G² = ", round(deviance(mod.glm), 2))
             main_txt <- if (is.null(main_txt)) g2_val else paste(main_txt, g2_val, sep = ", ")
         }
-        if (!is.null(main_txt)) args$main <- main_txt
+        
+        if (!is.null(main_txt)) {
+            args$main <- wrap_title(main_txt, 60)
+            args$main_gp <- grid::gpar(fontsize = 12)
+        }
         
         suppressWarnings(do.call(vcd::mosaic, args))
     })

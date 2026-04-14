@@ -32,13 +32,12 @@ ui <- fluidPage(
                 div(
                     h1("Shiny Mosaics", style = "font-weight: bold; margin: 0;"),
                     h6("Version 1.0.0"),
-                    HTML('
-                        <div style="font-size:12px; color:#555; text-align:left; margin-top:10px;">
-                        Created by Gabriel Crone & Naomi Martinez Gutierrez.<br>
-                        Inspired by Michael Friendly\'s 
-                        <a href="http://euclid.psych.yorku.ca/cgi/mosaics" target="_blank"><i>mosaics</i></a> visualization tool.
-                        </div>
-                    ')
+                    HTML('<div style="font-size:12px; color:#555; text-align:left; margin-top:10px;">
+    Created by Gabriel Crone & Naomi Martinez Gutierrez.<br>
+    All code is available on <a href="https://github.com/naomimmg/PSYC6136-APP" target="_blank"> Github. </a>  <br>
+    Inspired by Michael Friendly\'s 
+    <a href="http://euclid.psych.yorku.ca/cgi/mosaics" target="_blank"><i>mosaics</i></a> visualization tool.<br>
+</div>')
                 )
             )
         )
@@ -61,15 +60,42 @@ ui <- fluidPage(
             
             conditionalPanel(
                 condition = "input.data_option == 'Upload data'",
+                
+                tags$small(
+                    HTML('Data must be <b>.csv/.tsv</b> and structured in '),
+                    actionLink(
+                        inputId = "freq_help",
+                        label = HTML("<b>frequency format</b>.")
+                    )
+                ),
                 fileInput("upload", "Upload CSV/TSV", accept = c(".csv", ".tsv")),
                 uiOutput("var_select_inputs")
             ),
             
-            hr(),
             h4("Step Guide"),
             tags$small("1. Choose/Upload Data"), br(),
             tags$small("2. Verify Levels & Select Factors"), br(),
-            tags$small("3. Build Statistical Model & Customize Plot")
+            tags$small("3. Build Statistical Model & Customize Plot"), br(),
+            tags$small(
+                h4("Navigation"),
+                tags$div(
+                    tags$span(
+                        class = "btn btn-primary btn-xs",
+                        style = "pointer-events: none; cursor: default;",
+                        "Next"
+                    ),
+                    " = go forward"
+                ),
+                
+                tags$div(
+                    tags$span(
+                        class = "btn btn-default btn-xs",
+                        style = "pointer-events: none; cursor: default;",
+                        "Back"
+                    ),
+                    " = go back"
+                )
+            )
         ),
         
         mainPanel(
@@ -79,10 +105,10 @@ ui <- fluidPage(
                 tabPanel("1. Data Selection", value = "tab1", br(),
                          shinyjs::hidden(
                              div(id = "tab1_contents",
-                                 h4("Data Preview"),
+                                 h4("Table Preview"),
                                  uiOutput("table_preview"),
                                  hr(),
-                                 div(style = "float: right;", 
+                                 div(style = "float: left;", 
                                      actionButton("next1", "Next: Data Cleaning", class = "btn-primary"))
                              )
                          )
@@ -106,7 +132,7 @@ ui <- fluidPage(
                                     wellPanel(
                                         h4("Model Specification"),
                                         radioButtons("customize_formula_options", "Model Formula Customization:",
-                                                     choices = c("No customization", "Select among defaults", "Write custom formula")),
+                                                     choices = c("No customization", "Select model type", "Write custom formula")),
                                         
                                         conditionalPanel(
                                             condition = "input.customize_formula_options == 'Write custom formula'",
@@ -115,12 +141,12 @@ ui <- fluidPage(
                                         ),
                                         
                                         conditionalPanel(
-                                            condition = "input.customize_formula_options == 'Select among defaults'",
+                                            condition = "input.customize_formula_options == 'Select model type'",
                                             uiOutput("select_formula_ui"),
                                             textOutput("formula_preview")
                                         ),
                                         
-                                        selectInput("residual_type", "Residual type:", choices = NULL),
+                                        selectInput("residual_type", "Residual Type:", choices = NULL),
                                         hr(),
                                         h4("Mosaic Plot Options"),
                                         selectInput("shading_type", "Shading Style:",
