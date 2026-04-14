@@ -49,6 +49,7 @@ data_sets <- list(Employment, Caesar, Titanic, Suicide,
                   UCBAdmissions, Divorce, Abortion, HairEyeSex, 
                   Heart, HairEye)
 
-names(data_sets) <- c("Employment", "Caesar", "Titanic", "Suicide", 
-                      "UCBAdmissions", "Divorce", "Abortion", "HairEyeSex", 
-                      "Heart", "HairEye")
+names(data_sets) <- c("Employment Status Data", "Infection in Cesaerean Births", "Titanic Data", 
+                      "Suicide Data", "Berkeley Admissions Data", "Divorce Data",
+                      "Abortion Opinion Data", "HairEyeSex Data", 
+                      "Heart Disease Data", "HairEye Data")

@@ -1,8 +1,20 @@
+# Load required libraries
+library(vcd)
+library(vcdExtra)
+library(shiny)
+library(tidyverse)
+library(shinyjs)
+library(colourpicker)
+
+# Source required files
+source("Functions.R")
+source("data.R")
+
 # Explicitly add path to find image to ensure RStudio is reading it
 addResourcePath("www", "www")
 
 ui <- fluidPage(
-    useShinyjs(), 
+    shinyjs::useShinyjs(), 
     tags$head(
         tags$style(HTML("
             .nav-tabs li:not(.active) a { color: #999 !important; background-color: #f8f9fa !important; cursor: not-allowed !important; }
