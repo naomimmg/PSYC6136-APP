@@ -1,0 +1,99 @@
+---
+title: "Final Report"
+author: "Gabriel Crone & Naomi Martinez Gutierrez"
+format: html
+theme: cosmo
+bibliography: references.bib
+---
+
+# Building Blocks: *n*-way tables, log-linear models, and the mosaic display
+
+## What is an *n*-way table? {#sec-n-way-tabs}
+
+## What are log-linear models? {#sec-log-lin-mod}
+
+## What are mosaic displays?
+
+## Worked example
+
+# Mosaic Displays in action: *mosaics* app
+
+# *mosaics* Re-imagined: *Shiny Mosaics*
+
+In an effort to improve [*mosaics*](http://euclid.psych.yorku.ca/cgi/mosaics), the authors created *Shiny Mosaics*. The app was built using the *shiny* R package [@shiny], which excels at creating fully interactive web apps. Below are some ways in which *Shiny Mosaics* is an improvement to *mosaics*:
+
+1.  *mosaics* is no longer available to run. *Shiny Mosaics* can be run online using this link: <https://u2xwtv-gabriel-crone.shinyapps.io/psyc6136_app/>.
+
+2.  *mosaics* lacked interactivity. If one wanted to modify their mosaic display, they would need to start over from scratch each time. With *Shiny Mosaics*, users can modify any number of features of their display (e.g., plot title, theme, residuals) and the plot will update in real time.
+
+3.  *mosaics* was built using a set of PERL scripts, and whose code is available upon being run. However, most statistical coding is now done with the open-source, R coding language. *Shiny Mosaics* uses R, and all of its associated code is available on [Github](https://github.com/naomimmg/PSYC6136-APP).
+
+4.  *Shiny Mosaics* provides additional features that *mosaics* lacks. For example, it provides a color table preview of inputted data using the `color_table` function [@vcdExtra], allows users to input custom statistical formulas (underlying the log-linear model; see @sec-n-way-tabs), and permits full color customizations (for the `custom` theme).
+
+## How does the *Shiny Mosaics* app work?
+
+*Shiny Mosaics* was designed to be intuitive and user-friendly. Using the app is as simple as following three steps:
+
+### Step 1: Select Data
+
+Users begin by navigating to the sidebar and customizing the `Data Source`. If they wish to select from a set of example data sets, they would tick off, "Use Sample Data" and select from any data set provided in the accompanying drop-down menu.
+
+If they wanted to instead upload their own data, the app would accept any data file so long as it meets two criteria:
+
+1.  It is in .csv or .tsv format.
+
+2.  It is in frequency format: The data has one column specifying frequency, with two or more columns of categorical variables (typically, these are of `factor` or `character` type in R).
+
+If users choose to upload their data, they must specify which data column captures frequency (e.g., `freq`, `n`) and all of the other categorical variable columns. (They need not specify *all* of them; if they prefer to only focus on a subset, they may select a subset of the categorical variables.)
+
+As soon as a data source is specified, the app will automatically generate a `color_table()` [@vcdExtra] that previews the tabular data. This table functions as a check to determine if the data were imported correctly, and is akin to a mosaic display previewer: it fits a mutual independence model, then creates a table whereby [blue]{style="color:blue;"} cells have a positive residual, [red]{style="color:red;"} cells have a negative residual, and the shading corresponds with the strength of the residual (e.g., [weak]{style="color: lightgrey;"}; [**strong**]{style="color: black"}).
+
+The user must then hit the [Next]{.btn .btn-primary .btn-xs style="pointer-events: none; cursor: default;"} button to proceed to Step 2.
+
+### Step 2: Variable Selection
+
+Users may select a subset of the variables from their inputted data. To aid them in deciding which variables to use, the app renders a written preview of all of the categorical variables, along with each one's corresponding unique levels (e.g., `sex`: male, female; `contact`: High, Low). Users should select at least two variables to ensure that the rendered mosaic display is informative.
+
+By default, if no variables are selected, all variables in the data set will be used.
+
+To proceed, users once again hit the [Next]{.btn .btn-primary .btn-xs style="pointer-events: none; cursor: default;"} button.
+
+### Step 3: Specify Model & Customize Plot
+
+Lastly, users specify the underlying statistical model for the plot, and (optionally) customize it further. At this step, a mosaic display is rendered, and modifying either the model or the customization will modify the mosaic display.
+
+#### 3a: Specify Model
+
+Users have the option of specifying a statistical formula underlying the log-linear model, as well as the residuals for the model (see @sec-log-lin-mod). By default, `No customization` is selected, which simply fits the mutual independence model (e.g., \[A\]\[B\]\[C\]...\[K\] for a k-way table) to the data.
+
+If users wish to specify from a list of reasonable formula options, they may select `Select model type` to produce a drop-down menu of reasonable model types (e.g., mutual independence, joint independence, conditional independence, markov, saturated). Once a formula is selected, the server will automatically update the mosaic plot to using a log-linear model with the specified formula. So as to allow users to see if their formula is appropriate, the formula will appear below the model selection box, and will also be displayed as the plot title.
+
+If users wish to specify their own formula by typing it in, they may do so by selecting `Write custom formula`. To remind the user of the variable names, they will appear above the text box. Within the text box, users would type out their formula. The generic formula shown is of the form `Freq ~ A + B + C`, but users may use any acceptable model syntax in their formula (e.g., including interaction terms with `*` or `:` such as in `freq ~ A * B + C`), and include (or exclude) any factors they so wish to.
+
+Lastly, users may select a residual type to be implemented in the mosaic display. If they do not specify a formula, they may choose from one of three options (for details, see <https://cran.r-project.org/web/packages/vcd/vcd.pdf>, p. 116):
+
+1.  `pearson`- Uses components of Pearson's $\chi^2$,
+
+2.  `deviance`- Uses components of the likelihood ratio $\chi^2$, and
+
+3.  `ft`- Uses Freemen-Tukey residuals.
+
+If a formula is specified, Freeman-Tukey residuals are not available, so in its place, the `rstandard` option can be selected. `rstandard` uses standardized, Pearson $\chi^2$ residuals.
+
+#### 3b: Customize the mosaic display
+
+There are many options to customize and personalize the mosaic display so it best suits the user's preferences:
+
+1.  Shading Style- Users may choose from one of: `Friendly`, `Friendly2`, `sieve`, and `custom` (for details, see [`vcd::shadings`](https://cran.r-project.org/web/packages/vcd/vignettes/residual-shadings.pdf)). If `custom` is selected, users may specify the exact color for the positive and negative residuals. Each color is selected using a color picker widget (created with the `colourpicker` R package [@colourpicker]).
+2.  Residual labels- Whether or not to show residual labels within the cells of the plot.
+3.  Whether or not to display the formula title in the plot (defaults to yes).
+4.  Whether or not to display the $G^2$ statistic in the title (only shows if one specifies their own formula; defaults to no). If a user wishes to display both the formula title and $G^2$ in the plot, the title will print the formula, followed by a comma and the $G^2$ value (e.g., "Freq \~ A + B, $G^2$ = 10". If only $G^2$ is specified, only the $G^2$ will be displayed (e.g., "$G^2$ = 10").
+5.  Split directions: Whether to shift the x-axis with the y-axis. Ticking off the respective box will swap the axis, and un-ticking it off will swap the axes back to how they were before.
+
+To transfer the final mosaic display, users should simply right click the plot, copy it, and paste it to wherever they wish.
+
+### Applied Example: \<DATA\> Data
+
+\<APPLIED EXAMPLE USING THE APP WILL GO HERE\>
+
+# References
