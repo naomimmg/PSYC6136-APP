@@ -1,5 +1,56 @@
 server <- function(input, output, session) {
     #----- General setup/navigation ----
+    output$downloadPNG <- downloadHandler(
+        filename = function() { paste("mosaic-", Sys.Date(), ".png", sep = "") },
+        content = function(file) {
+            png(file, width = 1200, height = 900, res = 150)
+            create_mosaic()
+            dev.off()
+        }
+    )
+    output$downloadSVG <- downloadHandler(
+        filename = function() { paste("mosaic-", Sys.Date(), ".svg", sep = "") },
+        content = function(file) {
+            svg(file, width = 10, height = 8)
+            create_mosaic()
+            dev.off()
+        }
+    )
+    create_mosaic <- function() {
+        req(mod_dat())
+        customized <- input$customize_formula_options != "No customization"
+        args <- list(gp = selected_shading(), split_vertical = input$split)
+        
+        mod.glm <- NULL
+        if (customized) {
+            df <- as.data.frame(mod_dat())
+            mod.glm <- glm(mod_dat_form(), data = df, family = poisson())
+            args$x <- mod.glm
+            args$data <- df
+        } else {
+            args$x <- mod_dat()
+        }
+        
+        args$residuals_type <- input$residual_type
+        if (input$show_residuals) args$labeling <- labeling_residuals()
+        
+        wrap_title <- function(x, width = 60) paste(strwrap(x, width = width), collapse = "\n")
+        
+        main_txt <- NULL
+        if (input$show_formula) main_txt <- paste(deparse(mod_dat_form()), collapse = "")
+        if (input$show_g_square & customized) {
+            g2_val <- paste0("G² = ", round(deviance(mod.glm), 2))
+            main_txt <- if (is.null(main_txt)) g2_val else paste(main_txt, g2_val, sep = ", ")
+        }
+        
+        if (!is.null(main_txt)) {
+            args$main <- wrap_title(main_txt, 60)
+            args$main_gp <- grid::gpar(fontsize = 12)
+        }
+        
+        suppressWarnings(do.call(vcd::mosaic, args))
+    }
+    
     observe({
         data_ready <- FALSE
         if (input$data_option == "Use sample data" && input$select_sample_dat != "") {
@@ -79,7 +130,6 @@ server <- function(input, output, session) {
     })
     
     
-    
     select_dat <- reactive({
         if (input$data_option == "Use sample data") {
             req(input$select_sample_dat)
@@ -90,7 +140,7 @@ server <- function(input, output, session) {
             xtabs(form, data = uploaded_data())
         }
     })
-
+    
     
     output$table_preview <- renderUI({
         req(select_dat())
@@ -178,7 +228,7 @@ server <- function(input, output, session) {
     output$mosaic_plot <- renderPlot({
         req(mod_dat())
         customized <- input$customize_formula_options != "No customization"
-        args <- list(gp = selected_shading(), split_vertical = "V" %in% input$split)
+        args <- list(gp = selected_shading(), split_vertical = input$split)
         
         mod.glm <- NULL
         if (customized) {

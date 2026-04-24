@@ -20,6 +20,22 @@ ui <- fluidPage(
             .nav-tabs li:not(.active) a { color: #999 !important; background-color: #f8f9fa !important; cursor: not-allowed !important; }
             .nav-tabs li:not(.active) { pointer-events: none !important; }
             .nav-tabs li.active a { color: #000 !important; font-weight: bold; background-color: #fff !important; }
+            .resizable-plot { 
+            resize: both; 
+            overflow: auto; 
+            border: 1px solid #ddd; 
+            background: white;
+            width: 100%;
+            height: 600px; 
+            min-height: 300px;
+            padding-bottom: 15px; 
+            }
+
+            .resizable-plot .shiny-plot-output, 
+            .resizable-plot .shiny-plot-output img {
+            height: 100% !important;
+            width: 100% !important;
+            }
         "))
     ),
     
@@ -114,8 +130,8 @@ ui <- fluidPage(
                          )
                 ),
                 
-                tabPanel("2. Data Cleaning", value = "tab2", br(),
-                         h4("Factor Levels & Variable Selection"),
+                tabPanel("2. Factor Selection", value = "tab2", br(),
+                         h4("Factor Selection & Levels"),
                          verbatimTextOutput("level_preview"),
                          selectInput("select_factors", 
                                      label = "Factors to include in display (default is all):",
@@ -158,19 +174,25 @@ ui <- fluidPage(
                                         ),
                                         checkboxInput("show_residuals", "Show residual labels?", TRUE),
                                         checkboxInput("show_formula", "Display formula title?", TRUE),
+                                        checkboxInput("split", "Change X and Y axis?", FALSE),
+                                        
                                         conditionalPanel(
                                             condition = "input.customize_formula_options != 'No customization'",
                                             checkboxInput("show_g_square", "Display G² statistic?", FALSE)
                                         ),
-                                        checkboxGroupInput("split", "Split Directions:", 
-                                                           choices = c("Horizontal" = "H", "Vertical" = "V"), 
-                                                           selected = c("H", "V")),
                                         hr(),
                                         actionButton("back3", "Back", class = "btn-default")
                                     )
                              ),
                              column(8,
-                                    plotOutput("mosaic_plot")
+                                    div(class = "resizable-plot",
+                                        style = "position: relative;",
+                                        div(style = "position: absolute; right: 10px; top: 5px; z-index: 1000;",
+                                            downloadButton("downloadPNG", "PNG", class = "btn-xs"),
+                                            downloadButton("downloadSVG", "SVG", class = "btn-xs")
+                                        ),
+                                        plotOutput("mosaic_plot", height = "auto")
+                                    )
                              )
                          )
                 )
