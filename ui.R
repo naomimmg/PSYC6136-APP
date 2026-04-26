@@ -125,7 +125,7 @@ ui <- fluidPage(
                                  uiOutput("table_preview"),
                                  hr(),
                                  div(style = "float: left;", 
-                                     actionButton("next1", "Next: Data Cleaning", class = "btn-primary"))
+                                     actionButton("next1", "Next: Factor Selection", class = "btn-primary"))
                              )
                          )
                 ),
