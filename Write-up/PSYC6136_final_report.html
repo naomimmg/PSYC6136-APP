@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,6 +10,9 @@
 
 <title>Final Report</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -25,7 +28,6 @@ ul.task-list li input[type="checkbox"] {
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -47,18 +49,17 @@ div.csl-indent {
 <script src="PSYC6136_final_report_files/libs/clipboard/clipboard.min.js"></script>
 <script src="PSYC6136_final_report_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="PSYC6136_final_report_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="PSYC6136_final_report_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="PSYC6136_final_report_files/libs/quarto-html/popper.min.js"></script>
 <script src="PSYC6136_final_report_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="PSYC6136_final_report_files/libs/quarto-html/anchor.min.js"></script>
 <link href="PSYC6136_final_report_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="PSYC6136_final_report_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="PSYC6136_final_report_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="PSYC6136_final_report_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="PSYC6136_final_report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="PSYC6136_final_report_files/libs/bootstrap/bootstrap-a74871fe4945b66d259aafc266475145.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="PSYC6136_final_report_files/libs/bootstrap/bootstrap-8ffd5f67044e5306d9846f29df41dda5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -142,7 +143,7 @@ window.Quarto = {
 <h1><em>mosaics</em> Re-imagined: <em>Shiny Mosaics</em></h1>
 <p>In an effort to improve <a href="http://euclid.psych.yorku.ca/cgi/mosaics"><em>mosaics</em></a>, the authors created <em>Shiny Mosaics</em>. The app was built using the <em>shiny</em> R package <span class="citation" data-cites="shiny">(<a href="#ref-shiny" role="doc-biblioref">Chang et al. 2025</a>)</span>, which excels at creating fully interactive web apps. Below are some ways in which <em>Shiny Mosaics</em> is an improvement to <em>mosaics</em>:</p>
 <ol type="1">
-<li><p><em>mosaics</em> is no longer available to run. <em>Shiny Mosaics</em> can be run online using this link: <a href="https://u2xwtv-gabriel-crone.shinyapps.io/psyc6136_app/" class="uri">https://u2xwtv-gabriel-crone.shinyapps.io/psyc6136_app/</a>.</p></li>
+<li><p><em>mosaics</em> is no longer available to run. <em>Shiny Mosaics</em> can be run online using this link: <a href="https://fohpsyc.shinyapps.io/psyc6136_app/" class="uri">https://fohpsyc.shinyapps.io/psyc6136_app/</a>.</p></li>
 <li><p><em>mosaics</em> lacked interactivity. If one wanted to modify their mosaic display, they would need to start over from scratch each time. With <em>Shiny Mosaics</em>, users can modify any number of features of their display (e.g., plot title, theme, residuals) and the plot will update in real time.</p></li>
 <li><p><em>mosaics</em> was built using a set of PERL scripts, and whose code is available upon being run. However, most statistical coding is now done with the open-source, R coding language. <em>Shiny Mosaics</em> uses R, and all of its associated code is available on <a href="https://github.com/naomimmg/PSYC6136-APP">Github</a>.</p></li>
 <li><p><em>Shiny Mosaics</em> provides additional features that <em>mosaics</em> lacks. For example, it provides a color table preview of inputted data using the <code>color_table</code> function <span class="citation" data-cites="vcdExtra">(<a href="#ref-vcdExtra" role="doc-biblioref">Friendly 2026</a>)</span>, allows users to input custom statistical formulas (underlying the log-linear model; see <a href="#sec-n-way-tabs" class="quarto-xref">Section&nbsp;1.1</a>), and permits full color customizations (for the <code>custom</code> theme).</p></li>
@@ -208,15 +209,15 @@ window.Quarto = {
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-colourpicker" class="csl-entry" role="listitem">
-Attali, Dean. 2023. <span>“Colourpicker: A Colour Picker Tool for Shiny and for Selecting Colours in Plots.”</span> <a href="https://doi.org/10.32614/CRAN.package.colourpicker">https://doi.org/10.32614/CRAN.package.colourpicker</a>.
+Attali, Dean. 2023. <em>Colourpicker: A Colour Picker Tool for Shiny and for Selecting Colours in Plots</em>. <a href="https://doi.org/10.32614/CRAN.package.colourpicker">https://doi.org/10.32614/CRAN.package.colourpicker</a>.
 </div>
 <div id="ref-shiny" class="csl-entry" role="listitem">
-Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke, Yihui Xie, Jeff Allen, Jonathan McPherson, Alan Dipert, and Barbara Borges. 2025. <span>“Shiny: Web Application Framework for r.”</span> <a href="https://doi.org/10.32614/CRAN.package.shiny">https://doi.org/10.32614/CRAN.package.shiny</a>.
+Chang, Winston, Joe Cheng, JJ Allaire, et al. 2025. <em>Shiny: Web Application Framework for r</em>. <a href="https://doi.org/10.32614/CRAN.package.shiny">https://doi.org/10.32614/CRAN.package.shiny</a>.
 </div>
 <div id="ref-vcdExtra" class="csl-entry" role="listitem">
-Friendly, Michael. 2026. <span>“vcdExtra: ’Vcd’ Extensions and Additions.”</span> <a href="https://github.com/friendly/vcdExtra">https://github.com/friendly/vcdExtra</a>.
+Friendly, Michael. 2026. <em>vcdExtra: ’Vcd’ Extensions and Additions</em>. <a href="https://github.com/friendly/vcdExtra">https://github.com/friendly/vcdExtra</a>.
 </div>
 </div></section></div></main>
 <!-- /main column -->

@@ -22,7 +22,7 @@ bibliography: references.bib
 
 In an effort to improve [*mosaics*](http://euclid.psych.yorku.ca/cgi/mosaics), the authors created *Shiny Mosaics*. The app was built using the *shiny* R package [@shiny], which excels at creating fully interactive web apps. Below are some ways in which *Shiny Mosaics* is an improvement to *mosaics*:
 
-1.  *mosaics* is no longer available to run. *Shiny Mosaics* can be run online using this link: <https://u2xwtv-gabriel-crone.shinyapps.io/psyc6136_app/>.
+1.  *mosaics* is no longer available to run. *Shiny Mosaics* can be run online using this link: <https://fohpsyc.shinyapps.io/psyc6136_app/>.
 
 2.  *mosaics* lacked interactivity. If one wanted to modify their mosaic display, they would need to start over from scratch each time. With *Shiny Mosaics*, users can modify any number of features of their display (e.g., plot title, theme, residuals) and the plot will update in real time.
 
@@ -60,7 +60,7 @@ To proceed, users once again hit the [Next]{.btn .btn-primary .btn-xs style="poi
 
 ### Step 3: Specify Model & Customize Plot
 
-Lastly, users specify the underlying statistical model for the plot, and (optionally) customize it further. At this step, a mosaic display is rendered, and modifying either the model or the customization will modify the mosaic display.
+Lastly, users specify the underlying statistical model for the plot, and (optionally) customize it further. At this step, a mosaic display is rendered, and modifying either the model or the customization will automatically alter the mosaic display.
 
 #### 3a: Specify Model
 
