@@ -10,13 +10,102 @@ bibliography: references.bib
 
 ## What is an *n*-way table? {#sec-n-way-tabs}
 
+An *n*-way table (or contingency table) is a multi-dimensional grid used to summarize the relationship between two or more categorical variables. Each cell in the table represents the joint frequency (count) of a specific combination of variable levels. For example, a 3-way table ($A \times B \times C$) cross-classifies observations by three factors simultaneously. As $n$ increases, the complexity of the table grows, making raw frequency counts difficult to interpret without statistical modeling or visualization.
+
 ## What are log-linear models? {#sec-log-lin-mod}
+
+Log-linear models are a class of generalized linear models used to analyze patterns of association and independence in *n*-way tables. Rather than predicting a dependent variable, log-linear models treat all variables symmetrically, modeling the logarithm of the expected cell frequencies ($\mu$) as a linear combination of main effects and interaction terms:
+
+$$\log(\mu_{ijk}) = \lambda + \lambda_i^A + \lambda_j^B + \lambda_k^C + \lambda_{ij}^{AB} + \dots$$
+The goal is to find the most parsimonious model that explains the data. A **Mutual Independence** model assumes no associations between variables, while a **Saturated Model** perfectly fits the data by including all possible interaction terms.
 
 ## What are mosaic displays?
 
+A mosaic display is a graphical representation of an *n*-way table where the area of each "tile" is proportional to the observed frequency in that cell. 
+
+They serve as the visual counterpart to **log-linear models** by encoding the model residuals (i.e., the difference between observed and expected frequencies) into the color and intensity of the tiles.
+
+The *Visual Grammar* of the mosaic display is:
+
+**Tiles:** The area represents the counts.
+
+**Shading:** Colors represent the **residuals** (typically Pearson or Standardized residuals). 
+
+**Interpretation:** Blue shading indicates that the observed count is *higher* than the model predicts, while red indicates it is *lower*.
+
 ## Worked example
 
+To illustrate, consider a psychopharmacological study investigating a new drug. The study consists of three variables: **Treatment** (Active v. Placebo), **Diagnosis** (Depression v. Anxiety), and **Outcome** (Improved v. Declined).
+
+| Treatment | Diagnosis  | Outcome  | Frequency |
+|-----------|------------|----------|-----------|
+| Active    | Depression | Improved | 85        |
+| Active    | Depression | Declined | 15        |
+| Active    | Anxiety    | Improved | 70        |
+| Active    | Anxiety    | Declined | 30        |
+| Placebo   | Depression | Improved | 40        |
+| Placebo   | Depression | Declined | 60        |
+| Placebo   | Anxiety    | Improved | 35        |
+| Placebo   | Anxiety    | Declined | 65        |
+
+
+By fitting a **Mutual Independence** model, we can visualize efficacy of the drug:
+
+```{r}
+#| label: fig-mosaic-clinical
+#| fig-cap: "Mosaic Display of Clinical Data Testing Mutual Independence"
+#| warning: false
+#| message: false
+
+library(vcd)
+library(MASS)
+
+# Create the data frame
+trial_data <- data.frame(
+  Treatment = rep(c("Active", "Placebo"), each = 4),
+  Diagnosis = rep(c("Depression", "Anxiety"), each = 2, times = 2),
+  Outcome   = rep(c("Improved", "Declined"), times = 4),
+  Freq      = c(85, 15, 70, 30, 40, 60, 35, 65)
+)
+
+# Convert to table for loglm
+trial_tab <- xtabs(Freq ~ Treatment + Diagnosis + Outcome, data = trial_data)
+
+# Fit Mutual Independence model [T][D][O]
+mod_indep <- MASS::loglm(~ Treatment + Diagnosis + Outcome, data = trial_tab)
+
+# Generate Mosaic with Friendly shading
+vcd::mosaic(mod_indep, 
+            shade = TRUE, 
+            gp = shading_Friendly,
+            main = "Mutual Independence Model: Clinical Trial")
+```
+
 # Mosaic Displays in action: *mosaics* app
+
+The original [*mosaics*](http://euclid.psych.yorku.ca/cgi/mosaics) web application, developed by Dr. Michael Friendly, serves as our inspiration for modern interactive categorical data visualization. As a pioneering tool in the field, it was designed to allow researchers to move beyond static plots and create customized mosaic displays based on either user-inputted data or a selection of default datasets. 
+
+The original *mosaics* interface provided customizations that allowed user control over both the statistical and visual aspects of the display:
+
+### 1. Analysis and Model Specification
+The app allowed users to define the underlying statistical logic of the plot by selecting:
+
+*   **Fit Type:** Users could specify the type of independence model being tested, such as **MUTUAL** (all variables independent), **JOINT** (one variable independent of others), or **CONDIT** (conditional independence).
+
+*   **Variable Order:** Users could manipulate the order of variables in the model, which dictates the nesting of the mosaic tiles.
+
+*   **Residual Type:** The app supported various methods for calculating residuals, including Pearson (**GF**), Likelihood Ratio (**LR**), and Freeman-Tukey (**FT**).
+
+### 2. Display Options
+To ensure the resulting plots were informative and publication-ready, *mosaics* included several aesthetic controls:
+
+*   **Fill Type:** Options to adjust the pattern and style of shading to represent residual magnitude.
+
+*   **Text Height:** The ability to scale the height of text labels for better legibility.
+
+*   **Split Directions:** Control over the "direction" of the partitions (horizontal vs. vertical), allowing users to choose how to divide the mosaic to best reveal the data structure.
+
+While the original *mosaics* app established these essential parameters for categorical analysis, its reliance on older web technologies provided the motivation for the development of our modern, R-based re-imagining.
 
 # *mosaics* Re-imagined: *Shiny Mosaics*
 
