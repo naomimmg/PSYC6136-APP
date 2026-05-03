@@ -2376,8 +2376,8 @@ window.Quarto = {
   </ul></li>
   <li><a href="#mosaic-displays-in-action-mosaics-app" id="toc-mosaic-displays-in-action-mosaics-app" class="nav-link" data-scroll-target="#mosaic-displays-in-action-mosaics-app"><span class="header-section-number">2</span> Mosaic Displays in action: <em>mosaics</em> app</a>
   <ul class="collapse">
-  <li><a href="#step-1-analysis-and-model-specification" id="toc-step-1-analysis-and-model-specification" class="nav-link" data-scroll-target="#step-1-analysis-and-model-specification"><span class="header-section-number">2.0.1</span> Step 1: Analysis and Model Specification</a></li>
-  <li><a href="#step-2-display-options" id="toc-step-2-display-options" class="nav-link" data-scroll-target="#step-2-display-options"><span class="header-section-number">2.0.2</span> Step 2: Display Options</a></li>
+  <li><a href="#analysis-and-model-specification" id="toc-analysis-and-model-specification" class="nav-link" data-scroll-target="#analysis-and-model-specification"><span class="header-section-number">2.0.1</span> Analysis and Model Specification</a></li>
+  <li><a href="#display-options" id="toc-display-options" class="nav-link" data-scroll-target="#display-options"><span class="header-section-number">2.0.2</span> Display Options</a></li>
   </ul></li>
   <li><a href="#mosaics-re-imagined-shiny-mosaics" id="toc-mosaics-re-imagined-shiny-mosaics" class="nav-link" data-scroll-target="#mosaics-re-imagined-shiny-mosaics"><span class="header-section-number">3</span> <em>mosaics</em> Re-imagined: <em>Shiny Mosaics</em></a>
   <ul class="collapse">
@@ -2393,7 +2393,8 @@ window.Quarto = {
   <li><a href="#demo-2-customized-workflow" id="toc-demo-2-customized-workflow" class="nav-link" data-scroll-target="#demo-2-customized-workflow"><span class="header-section-number">3.2.2</span> Demo 2: Customized Workflow</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">4</span> References</a></li>
+  <li><a href="#ai-disclosure" id="toc-ai-disclosure" class="nav-link" data-scroll-target="#ai-disclosure"><span class="header-section-number">4</span> AI Disclosure</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">5</span> References</a></li>
   </ul>
 </nav>
 </div>
@@ -2553,8 +2554,8 @@ Figure 1: Mosaic Display of Clinical Data Testing Mutual Independence
 <h1 data-number="2"><span class="header-section-number">2</span> Mosaic Displays in action: <em>mosaics</em> app</h1>
 <p>The original <a href="http://euclid.psych.yorku.ca/cgi/mosaics"><em>mosaics</em></a> web application, developed by Dr. Michael Friendly, serves as our inspiration for modern interactive categorical data visualization. As a pioneering tool in the field, it was designed to allow researchers to move beyond static plots and create customized mosaic displays based on either user-inputted data or a selection of default datasets.</p>
 <p>The original <em>mosaics</em> interface provided customizations that allowed user control over both the statistical and visual aspects of the display:</p>
-<section id="step-1-analysis-and-model-specification" class="level3" data-number="2.0.1">
-<h3 data-number="2.0.1" class="anchored" data-anchor-id="step-1-analysis-and-model-specification"><span class="header-section-number">2.0.1</span> Step 1: Analysis and Model Specification</h3>
+<section id="analysis-and-model-specification" class="level3" data-number="2.0.1">
+<h3 data-number="2.0.1" class="anchored" data-anchor-id="analysis-and-model-specification"><span class="header-section-number">2.0.1</span> Analysis and Model Specification</h3>
 <p>The app allowed users to define the underlying statistical logic of the plot by selecting:</p>
 <ul>
 <li><p><strong>Fit Type:</strong> Users could specify the type of independence model being tested, such as <strong>MUTUAL</strong> (all variables independent), <strong>JOINT</strong> (one variable independent of others), or <strong>CONDIT</strong> (conditional independence).</p></li>
@@ -2562,8 +2563,8 @@ Figure 1: Mosaic Display of Clinical Data Testing Mutual Independence
 <li><p><strong>Residual Type:</strong> The app supported various methods for calculating residuals, including Pearson (<strong>GF</strong>), Likelihood Ratio (<strong>LR</strong>), and Freeman-Tukey (<strong>FT</strong>).</p></li>
 </ul>
 </section>
-<section id="step-2-display-options" class="level3" data-number="2.0.2">
-<h3 data-number="2.0.2" class="anchored" data-anchor-id="step-2-display-options"><span class="header-section-number">2.0.2</span> Step 2: Display Options</h3>
+<section id="display-options" class="level3" data-number="2.0.2">
+<h3 data-number="2.0.2" class="anchored" data-anchor-id="display-options"><span class="header-section-number">2.0.2</span> Display Options</h3>
 <p>To ensure the resulting plots were informative and publication-ready, <em>mosaics</em> included several aesthetic controls:</p>
 <ul>
 <li><p><strong>Fill Type:</strong> Options to adjust the pattern and style of shading to represent residual magnitude.</p></li>
@@ -2648,12 +2649,18 @@ Figure 1: Mosaic Display of Clinical Data Testing Mutual Independence
 </section>
 </section>
 </section>
-<section id="references" class="level1 unnumbered" data-number="4">
+<section id="ai-disclosure" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> AI Disclosure</h1>
+<p>Generative artificial intelligence (AI), namely ChatGPT 4.0, was used regularly throughout the course of creating the code for the app. Whenever GPT 4.0 was used, the first author ensured that all code produced by it was correct by rigorously inspecting the code to ensure it was accurate, then running it over many trials to ensure that it worked as it should. Often, the first author would push back against advice suggested by the AI if it was cumbersome, verbose, or inaccurate, opting instead to always generate code that would work based on his prior experience with shiny and R. In the spirit of transparency, all chats with AI are available here: https://chatgpt.com/g/g-p-6988f4e58eb881918215c4e406a60e20-cat-dat-shiny-app/project.</p>
+<p>GPT 4.0 was also used to troubleshoot any bugs and new features for the app. As before, whenever GPT 4.0 was consulted, the first author ensured that solutions proposed worked theoretically (the code was logical and coherent with the code base) and worked in practice (via re-running the app and testing it out several times)</p>
+<p>AI, however, was not consulted throughout the process of creating this report.</p>
+</section>
+<section id="references" class="level1 unnumbered" data-number="5">
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">4 References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">5 References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-colourpicker" class="csl-entry" role="listitem">
 Attali, Dean. 2023. <em>Colourpicker: A Colour Picker Tool for Shiny and for Selecting Colours in Plots</em>. <a href="https://doi.org/10.32614/CRAN.package.colourpicker">https://doi.org/10.32614/CRAN.package.colourpicker</a>.
 </div>

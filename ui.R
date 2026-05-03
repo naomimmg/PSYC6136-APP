@@ -50,6 +50,7 @@ ui <- fluidPage(
                     h6("Version 1.0.0"),
                     HTML('<div style="font-size:12px; color:#555; text-align:left; margin-top:10px;">
     Created by Gabriel Crone & Naomi Martinez Gutierrez.<br>
+    Learn more about the app in the accompanying <a href="https://gcrone14.github.io/App-Writeup/" target="_blank">writeup</a>. <br>
     All code is available on <a href="https://github.com/naomimmg/PSYC6136-APP" target="_blank"> Github. </a>  <br>
     Inspired by Michael Friendly\'s 
     <a href="http://euclid.psych.yorku.ca/cgi/mosaics" target="_blank"><i>mosaics</i></a> visualization tool.<br>

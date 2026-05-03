@@ -5,6 +5,6 @@ account: fohpsyc
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 17237152
-bundleId: 11912461
+bundleId: 11941760
 url: https://fohpsyc.shinyapps.io/psyc6136_app/
 version: 1
