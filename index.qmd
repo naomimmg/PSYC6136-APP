@@ -1,15 +1,6 @@
 ---
 title: "Final Report"
 author: "Gabriel Crone & Naomi Martinez Gutierrez"
-format:
-  html:
-    theme: cosmo
-    toc: true
-    toc-depth: 3
-    number-sections: true
-    code-fold: true
-    embed-resources: true
-    smooth-scroll: true
 bibliography: references.bib
 ---
 
